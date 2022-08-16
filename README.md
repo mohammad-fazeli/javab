@@ -25,7 +25,6 @@
 - [yup](https://github.com/jquense/yup)
 - [multer](https://github.com/expressjs/multer)
 
-
 #### frontend:
 
 - [Next.js](https://nextjs.org/) (typeScript)
@@ -58,6 +57,8 @@ echo "
 PORT=8080
 MONGO_URI=mongodb://localhost:27017/javab
 JWT_SECRET=YOUR_SECRET_KEY
+EMAIL_SECRET=YOUR_EMAIL_SECRET_KEY
+FORGET_PASSWORD_SECRET=YOUR_FORGET_PASSWORD_SECRET_KEY
 EMAIL_ADDRESS=YOUR_GMAIL_ADDRESS
 EMAIL_PASSWORD=APP_PASSWORD_FOR_YOUR_GMAIL_ADDRESS
 URL=http://localhost:3000

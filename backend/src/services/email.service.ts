@@ -17,7 +17,7 @@ class email {
   }
   // TODO: change jwt secret
   sendVerificationEmail(email: string, cb: (err: any, info: any) => void) {
-    const token = jwt.sign({ email }, process.env.JWT_SECRET as string, {
+    const token = jwt.sign({ email }, process.env.EMAIL_SECRET as string, {
       expiresIn: "1h",
     });
     const mailOptions = {
@@ -44,7 +44,7 @@ class email {
   verifyVerificationEmail(token: string, cb: (err: any, decoded: any) => void) {
     jwt.verify(
       token,
-      process.env.JWT_SECRET as string,
+      process.env.EMAIL_SECRET as string,
       (err: any, decoded: any) => {
         if (err) {
           cb(err, null);
@@ -56,9 +56,13 @@ class email {
   }
   // TODO: change jwt secret
   sendForgotPasswordEmail(email: string, cb: (err: any, info: any) => void) {
-    const token = jwt.sign({ email }, process.env.JWT_SECRET as string, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { email },
+      process.env.FORGET_PASSWORD_SECRET as string,
+      {
+        expiresIn: "1h",
+      }
+    );
     const mailOptions = {
       from: process.env.EMAIL_ADDRESS as string,
       to: email,
@@ -82,7 +86,7 @@ class email {
   verifyForgotPassword(token: string, cb: (err: any, decoded: any) => void) {
     jwt.verify(
       token,
-      process.env.JWT_SECRET as string,
+      process.env.FORGET_PASSWORD_SECRET as string,
       (err: any, decoded: any) => {
         if (err) {
           cb(err, null);
