@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --config nodemon.json src/server.ts"
+    "dev": "nodemon --config nodemon.json src/app.ts"
   },
   "keywords": [],
   "author": "",
