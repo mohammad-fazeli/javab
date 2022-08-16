@@ -46,13 +46,18 @@
 
 ```sh
 git clone https://github.com/mohammad-fazeli/javab.git
+```
+
+```sh
 cd javab
 ```
 
 ```sh
 # in javab folder
 cd backend
+```
 
+```sh
 echo "
 PORT=8080
 MONGO_URI=mongodb://localhost:27017/javab
@@ -63,13 +68,14 @@ EMAIL_ADDRESS=YOUR_GMAIL_ADDRESS
 EMAIL_PASSWORD=APP_PASSWORD_FOR_YOUR_GMAIL_ADDRESS
 URL=http://localhost:3000
 " >> .env
+```
 
+```sh
 npm install
+```
+
+```sh
 npm start
-.
-.
-.
-Server is running on port 8080 #successfully start
 ```
 
 برای اجرای فرانت اند یک ترمینال جدید باز کنید و دستورات زیر را اجرا کنید:
@@ -77,9 +83,13 @@ Server is running on port 8080 #successfully start
 ```sh
 # in javab folder
 cd frontend
+```
 
+```sh
 npm i
+```
 
+```sh
 echo "
 NEXT_PUBLIC_API_URL=http://localhost:8080
 IMAGE_HOSTNAME=localhost
@@ -96,6 +106,9 @@ npm run dev
 
 ```sh
 npm run build
+```
+
+```sh
 npm run start
 ```
 
