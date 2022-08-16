@@ -91,7 +91,7 @@ IMAGE_HOSTNAME=localhost
 npm run dev
 ```
 
-برای اجرا در حالت production:
+اجرا در حالت production:
 
 ```sh
 npm run build
