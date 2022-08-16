@@ -90,7 +90,7 @@ const userSlice = createSlice({
       state.error = action.error;
     });
     builder.addCase(REHYDRATE, (state, action: any) => {
-      if (action.payload) {
+      if (action.payload?.user.user) {
         state.user = {
           name: action.payload.user?.user?.name,
           email: action.payload.user?.user?.email,
@@ -103,13 +103,13 @@ const userSlice = createSlice({
       return state;
     });
     builder.addCase(HYDRATE, (state, action: any) => {
-      if (action.payload.user) {
+      if (action.payload.user.user?.saved) {
         state.user = {
           name: state.user?.name || "",
           email: state.user?.email || "",
           admin: state.user?.admin || false,
           lessons: state.user?.lessons || [],
-          saved: action.payload.user.user?.saved || [],
+          saved: action.payload.user.user.saved,
         };
       }
       return state;
