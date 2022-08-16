@@ -58,7 +58,7 @@ const Heder: React.FC = () => {
   const ReduxState = useSelector((state: RootState) => {
     return {
       darkMode: state.theme.darkMode,
-      user: state.user.user,
+      token: state.user.token,
     };
   });
 
@@ -97,7 +97,7 @@ const Heder: React.FC = () => {
       />
       <div className="w-full md:max-w-screen-md md:mx-auto">
         <ul className="flex gap-5 p-3 items-center justify-center md:justify-start">
-          {ReduxState.user && (
+          {ReduxState.token && (
             <>
               <li>
                 <Link href="/lesson">صفحه اصلی</Link>
