@@ -1,4 +1,4 @@
-import { object, string } from "yup";
+import { object, string, array } from "yup";
 
 export const registerUserSchema = object({
   body: object({
@@ -48,5 +48,12 @@ export const changePasswordSchema = object({
 export const deleteAccountSchema = object({
   body: object({
     password: string().required("لطفا رمز عبور را وارد کنید"),
+  }),
+});
+
+export const setLessonSchema = object({
+  body: object({
+    lessonsId: array().required("لطفا دروس را وارد کنید"),
+    userId: string().required("لطفا id کاربر را وارد کنید"),
   }),
 });

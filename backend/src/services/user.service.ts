@@ -176,13 +176,12 @@ class User {
     }
     return user.saved;
   }
-  async addLessonToUser(user_id: string, lesson_id: string) {
+  async setLessons(user_id: string, lessons: string[]) {
+    const SetLessons = [...new Set(lessons)];
     const user = await this.userModel.findOneAndUpdate(
       { _id: user_id },
       {
-        $addToSet: {
-          lessons: lesson_id,
-        },
+        lessons: SetLessons,
       }
     );
     if (!user) {
@@ -191,22 +190,10 @@ class User {
         message: "کاربری یافت نشد",
       };
     }
+    return user;
   }
-  async removeLessonFromUser(user_id: string, lesson_id: string) {
-    const user = await this.userModel.findOneAndUpdate(
-      { _id: user_id },
-      {
-        $pull: {
-          lessons: lesson_id,
-        },
-      }
-    );
-    if (!user) {
-      throw {
-        code: 404,
-        message: "کاربری یافت نشد",
-      };
-    }
+  async getAll() {
+    return await this.userModel.find({ verified: true }, { name: 1, _id: 1 });
   }
 }
 

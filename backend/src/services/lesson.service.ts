@@ -7,7 +7,7 @@ class Lesson {
     this.Lesson = Lesson;
   }
   async getAll() {
-    return await this.Lesson.find();
+    return await this.Lesson.find({}, { title: 1, _id: 1 });
   }
   async getOne(id: string) {
     const lesson = await this.Lesson.findById(id);

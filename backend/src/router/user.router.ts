@@ -1,6 +1,6 @@
 import { Router } from "express";
 import validateRequest from "../middleware/validateRequest";
-import { isAuth } from "../utils/auth";
+import { isAdmin, isAuth } from "../utils/auth";
 //import schema for validation
 import {
   registerUserSchema,
@@ -8,6 +8,7 @@ import {
   restPasswordSchema,
   changePasswordSchema,
   deleteAccountSchema,
+  setLessonSchema,
 } from "../schema/user.schema";
 
 //import controller
@@ -22,8 +23,9 @@ import {
   addSavedPractice,
   getSavedPractices,
   removeSavedPractice,
-  addLessonToUser,
-  removeLessonFromUser,
+  setLessonToUser,
+  getLessons,
+  getAllUsers,
 } from "../controller/user.controller";
 
 const router = Router();
@@ -52,5 +54,13 @@ router.post(
 router.post("/saved/:id", isAuth, addSavedPractice);
 router.delete("/saved/:id", isAuth, removeSavedPractice);
 router.get("/saved", isAuth, getSavedPractices);
-
+router.post(
+  "/set-lesson",
+  isAuth,
+  isAdmin,
+  validateRequest(setLessonSchema),
+  setLessonToUser
+);
+router.get("/lessons/:userId", isAuth, isAdmin, getLessons);
+router.get("/", isAuth, isAdmin, getAllUsers);
 export default router;

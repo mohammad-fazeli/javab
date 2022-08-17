@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import userService from "../services/user.service";
 import emailService from "../services/email.service";
+import lessonService from "../services/lesson.service";
 import { signToken } from "../utils/auth";
 
 export const signup = async (req: Request, res: Response) => {
@@ -289,10 +290,10 @@ export const getSavedPractices = async (req: any, res: Response) => {
   }
 };
 
-export const addLessonToUser = async (req: any, res: Response) => {
+export const setLessonToUser = async (req: Request, res: Response) => {
   try {
-    const { userId, lessonId } = req.body;
-    await userService.addLessonToUser(userId, lessonId);
+    const { userId, lessonsId } = req.body;
+    await userService.setLessons(userId, lessonsId);
     res.status(200).json({
       status: 200,
       message: "درس با موفقیت به کاربر اضافه شد",
@@ -311,13 +312,24 @@ export const addLessonToUser = async (req: any, res: Response) => {
   }
 };
 
-export const removeLessonFromUser = async (req: any, res: Response) => {
+export const getLessons = async (req: Request, res: Response) => {
   try {
-    const { userId, lessonId } = req.body;
-    await userService.removeLessonFromUser(userId, lessonId);
+    const { userId } = req.params;
+    const lessons = await lessonService.getAll();
+    const userLessonsOnlyId = (await userService.findOneById(userId)).lessons;
+    const userLessonsByTitle = userLessonsOnlyId.map((lesson) => {
+      return lessons.find((l) => l._id.toString() === lesson.toString());
+    });
+    const allLessons = lessons.filter((lesson) => {
+      return !userLessonsOnlyId.includes(lesson._id);
+    });
     res.status(200).json({
       status: 200,
-      message: "درس با موفقیت از کاربر حذف شد",
+      message: "درس ها با موفقیت ارسال شدند",
+      data: {
+        userLessons: userLessonsByTitle,
+        allLessons: allLessons,
+      },
     });
   } catch (err: any) {
     if (err.code === 404) {
@@ -326,6 +338,22 @@ export const removeLessonFromUser = async (req: any, res: Response) => {
         message: err.message,
       });
     }
+    res.status(500).json({
+      status: 500,
+      message: "خطایی رخ داده است",
+    });
+  }
+};
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await userService.getAll();
+    res.status(200).json({
+      status: 200,
+      message: "کاربران با موفقیت ارسال شد",
+      data: users,
+    });
+  } catch (err: any) {
     res.status(500).json({
       status: 500,
       message: "خطایی رخ داده است",
