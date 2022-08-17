@@ -1,6 +1,10 @@
 /backend/.env
 /backend/node_modules
 /backend/build
+/backend/public/files/practice/*.jpg
+/backend/public/files/practice/*.jpeg
+/backend/public/files/practice/*.png
+/backend/public/files/practice/*.pdf
 
 /frontend/.env
 /frontend/node_modules
