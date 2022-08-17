@@ -4,11 +4,9 @@ const useClickOutside = (
   ref: React.MutableRefObject<any>,
   callback: () => void
 ) => {
-  const [click, setClick] = useState(false);
   useEffect(() => {
     function handleClickOutside(event: any) {
       if (ref.current && !ref.current.contains(event.target)) {
-        setClick(true);
         callback();
       }
     }
@@ -17,7 +15,7 @@ const useClickOutside = (
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [callback, click, ref]);
+  }, [callback, ref]);
 };
 
 export default useClickOutside;

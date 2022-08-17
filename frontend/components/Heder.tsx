@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import useClickOutside from "../hooks/useClickOutside";
 import {
@@ -8,6 +8,7 @@ import {
   MdDarkMode,
   MdLightMode,
   MdWest,
+  MdPerson,
 } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { setMode } from "../store/theme/slice";
@@ -24,8 +25,13 @@ interface HeaderDropdownProps {
 }
 
 const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ children, title }) => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const dropDownRef = useRef(null);
+  useEffect(() => {
+    //setIsOpen(false) if route changes
+    setIsOpen(false);
+  }, [router.pathname]);
   useClickOutside(dropDownRef, () => {
     setIsOpen(false);
   });
@@ -34,7 +40,7 @@ const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ children, title }) => {
       <span
         className="cursor-pointer"
         onClick={() => {
-          setIsOpen(true);
+          setIsOpen(!isOpen);
         }}
       >
         {title}
@@ -59,6 +65,7 @@ const Heder: React.FC = () => {
     return {
       darkMode: state.theme.darkMode,
       token: state.user.token,
+      isAdmin: state.user.user?.admin,
     };
   });
 
@@ -104,6 +111,12 @@ const Heder: React.FC = () => {
               </li>
               <HeaderDropdown title={<p className="disable-select">پروفایل</p>}>
                 <ul className="flex flex-col gap-2 disable-select">
+                  {ReduxState.isAdmin && (
+                    <li className="flex items-center gap-2 cursor-pointer">
+                      <MdPerson />
+                      <Link href="/users">کاربران</Link>
+                    </li>
+                  )}
                   <li className="flex items-center gap-2 cursor-pointer">
                     <MdChangeCircle />
                     <Link href="/change-password">تغییر رمز عبور</Link>

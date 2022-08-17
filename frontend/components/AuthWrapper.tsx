@@ -5,16 +5,25 @@ import { useRouter } from "next/router";
 
 interface IProps {
   children: React.ReactNode;
+  isAdmin?: boolean;
 }
 
-const AuthWrapper: React.FC<IProps> = ({ children }) => {
+const AuthWrapper: React.FC<IProps> = ({ children, isAdmin = false }) => {
   const router = useRouter();
-  const user = useSelector((state: RootState) => state.user.user);
+  const state = useSelector((state: RootState) => {
+    return {
+      isLoggedIn: state.user.token,
+      isAdmin: state.user.user?.admin,
+    };
+  });
   useEffect(() => {
-    if (!user) {
+    if (!state.isLoggedIn) {
       router.push("/login?redirect=lesson");
     }
-  }, [router, user]);
+    if (isAdmin && !state.isAdmin) {
+      router.push("/login?redirect=lesson");
+    }
+  }, [isAdmin, router, state]);
   return <>{children}</>;
 };
 

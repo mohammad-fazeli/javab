@@ -23,12 +23,14 @@ import themeSlice from "./theme/slice";
 import userSlice from "./user/slice";
 import itemsSlice from "./items/slice";
 import practiceSlice from "./practice/slice";
+import usersSlice from "./users/slice";
 
 const rootReducer = combineReducers({
   theme: themeSlice,
   user: userSlice,
   items: itemsSlice,
   practice: practiceSlice,
+  users: usersSlice,
 });
 
 const persistConfig = {
