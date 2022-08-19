@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import answerService from "../services/answer.service";
 import { removeFile } from "../utils/removeFile";
+import { compress } from "../utils/resizeImage";
 
 export const addAnswer = async (req: any, res: Response) => {
   try {
@@ -11,6 +12,9 @@ export const addAnswer = async (req: any, res: Response) => {
         code: 400,
         message: "فایل یا توضیح ضروری است",
       });
+    }
+    if (file) {
+      await compress(file.filename);
     }
     const answers = await answerService.add({
       user_id: req.user._id,
@@ -43,6 +47,9 @@ export const editAnswer = async (req: any, res: Response) => {
   const { answer_id } = req.params;
   const file = req.file;
   try {
+    if (file) {
+      await compress(file.filename);
+    }
     const answers = await answerService.edit({
       createdBy: req.user.name,
       answer_id,

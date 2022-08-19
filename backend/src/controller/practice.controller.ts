@@ -4,6 +4,7 @@ import userService from "../services/user.service";
 import answerService from "../services/answer.service";
 import mongoose from "mongoose";
 import { removeFile } from "../utils/removeFile";
+import { compress } from "../utils/resizeImage";
 
 export const getPractices = async (req: Request, res: Response) => {
   try {
@@ -66,6 +67,9 @@ export const createPractice = async (req: any, res: Response) => {
       user.admin ||
       user.lessons.includes(new mongoose.Types.ObjectId(lesson))
     ) {
+      if (file) {
+        await compress(file.filename);
+      }
       const practices = await practiceService.create({
         createdBy: user.name,
         lesson,
@@ -109,6 +113,9 @@ export const editPractice = async (req: any, res: Response) => {
     const practice = await practiceService.getOne(id, user._id);
 
     if (user.admin || user.lessons.includes(practice.lesson)) {
+      if (file) {
+        await compress(file.filename);
+      }
       const practices = await practiceService.edit(id, {
         title,
         question,
