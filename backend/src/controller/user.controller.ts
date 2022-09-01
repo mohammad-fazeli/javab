@@ -3,6 +3,7 @@ import userService from "../services/user.service";
 import emailService from "../services/email.service";
 import lessonService from "../services/lesson.service";
 import { signToken } from "../utils/auth";
+import { client } from "../db";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -47,7 +48,7 @@ export const verify = async (req: Request, res: Response) => {
       } else {
         try {
           const user = await userService.verify(decoded.email);
-          const token = signToken(user);
+          const token = await signToken(user);
           res.status(200).json({
             status: 200,
             message: "حساب کاربری شما تایید شد",
@@ -86,7 +87,7 @@ export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
     const user = await userService.login(email, password);
-    const token = signToken(user);
+    const token = await signToken(user);
     res.status(200).json({
       status: 200,
       message: "ورود با موفقیت انجام شد",
@@ -99,6 +100,7 @@ export const login = async (req: Request, res: Response) => {
       },
     });
   } catch (err: any) {
+    console.log("🚀 ~ file: user.controller.ts ~ line 102 ~ err", err);
     if (err.code === 401) {
       return res.status(401).json({
         status: 401,
@@ -205,7 +207,8 @@ export const changePassword = async (req: any, res: Response) => {
 export const deleteAccount = async (req: any, res: Response) => {
   try {
     const { password } = req.body;
-    await userService.delete(req.user._id, password);
+    const user = await userService.delete(req.user._id, password);
+    await client.del(user._id);
     res.status(200).json({
       status: 200,
       message: "حساب کاربری شما با موفقیت حذف شد",
@@ -294,6 +297,7 @@ export const setLessonToUser = async (req: Request, res: Response) => {
   try {
     const { userId, lessonsId } = req.body;
     await userService.setLessons(userId, lessonsId);
+    await client.del(userId);
     res.status(200).json({
       status: 200,
       message: "درس با موفقیت به کاربر اضافه شد",
