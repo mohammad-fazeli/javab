@@ -11,15 +11,17 @@ import { toast } from "react-toastify";
 import { wrapper } from "../store/store";
 import axios from "axios";
 import { setSaved } from "../store/user/slice";
+import { handleErrorServerSide } from "../store/utils/handleError";
 
 const Saved: NextPage = () => {
   const dispatch = useDispatch();
   const ReduxState = useSelector((state: RootState) => {
     return {
-      saved: state.user.user?.saved || [],
+      saved: state.user.saved,
       pending: state.user.pending,
     };
   });
+  console.log("🚀 ~ file: saved.tsx ~ line 23 ~ ReduxState", ReduxState.saved);
   const [state, setState] = useState({
     search: "",
   });
@@ -92,25 +94,29 @@ const Saved: NextPage = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) => async (context) => {
+    const token = context.req.headers.cookie?.replace("token=", "") || "";
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user/saved`,
         {
           headers: {
-            authorization:
-              context.req.headers.cookie?.replace("token=", "") || "",
+            authorization: token,
           },
         }
       );
       store.dispatch(setSaved(response.data.data));
     } catch (err: any) {
-      if (err.response?.status === 401) {
+      const response = await handleErrorServerSide(err, token, store);
+      if (response === 401) {
         return {
           redirect: {
-            destination: "/login?redirect=lesson",
+            destination: "/login?redirect=saved/",
             permanent: false,
           },
         };
+      }
+      if (typeof response != "number") {
+        store.dispatch(setSaved(response.data.data));
       }
     }
     return {

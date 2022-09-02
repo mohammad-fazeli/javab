@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../store";
+import { handleError } from "../utils/handleError";
 
 export const fetchLessons = createAsyncThunk(
   "users/",
@@ -17,8 +18,8 @@ export const fetchLessons = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -38,8 +39,8 @@ export const setLessons = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );

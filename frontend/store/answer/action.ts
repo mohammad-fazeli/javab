@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../store";
+import { handleError } from "../utils/handleError";
 
 export const addAnswer = createAsyncThunk(
   "answer/",
@@ -19,7 +20,7 @@ export const addAnswer = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return ThunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -42,7 +43,7 @@ export const editAnswer = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return ThunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -61,7 +62,7 @@ export const deleteAnswer = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return ThunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -81,7 +82,7 @@ export const decreaseRate = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return ThunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -101,7 +102,7 @@ export const increaseRate = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return ThunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -127,7 +128,7 @@ export const addComment = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return ThunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -150,7 +151,7 @@ export const editComment = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return ThunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -170,7 +171,7 @@ export const deleteComment = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return ThunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, ThunkAPI);
     }
   }
 );

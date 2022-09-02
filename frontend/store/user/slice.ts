@@ -8,12 +8,12 @@ type userType = {
   email: string;
   admin: boolean;
   lessons: string[];
-  saved: { _id: string; title: string }[];
 };
 
 type instalState = {
   user: userType | null;
   token: string | null;
+  saved: { _id: string; title: string }[];
   pending: boolean;
   error: SerializedError | null;
 };
@@ -21,6 +21,7 @@ type instalState = {
 const initialState: instalState = {
   user: null,
   token: null,
+  saved: [],
   pending: false,
   error: null,
 };
@@ -34,16 +35,11 @@ const userSlice = createSlice({
       state.token = null;
     },
     setUser: (state, action) => {
-      state.user = action.payload;
+      state.user = action.payload.user;
+      state.token = action.payload.token;
     },
     setSaved: (state, action) => {
-      state.user = {
-        name: "",
-        email: "",
-        admin: false,
-        lessons: [],
-        saved: action.payload,
-      };
+      state.saved = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -78,39 +74,32 @@ const userSlice = createSlice({
     builder.addCase(addSaved.fulfilled, (state, action) => {
       state.pending = false;
       state.error = null;
-      if (state.user) {
-        state.user = {
-          ...state.user,
-          saved: action.payload.data,
-        };
-      }
+      state.saved = action.payload.data;
     });
     builder.addCase(addSaved.rejected, (state, action) => {
       state.pending = false;
       state.error = action.error;
     });
     builder.addCase(REHYDRATE, (state, action: any) => {
-      if (action.payload?.user.user) {
-        state.user = {
-          name: action.payload.user?.user?.name,
-          email: action.payload.user?.user?.email,
-          admin: action.payload.user?.user?.admin,
-          lessons: action.payload.user?.user?.lessons,
-          saved: state.user?.saved || [],
-        };
-        state.token = action.payload.user?.token;
+      if (action.payload?.user) {
+        if (state.user) {
+          state.user = {
+            ...state.user,
+            lessons: [...state.user.lessons],
+          };
+        } else {
+          state.user = action.payload.user.user || null;
+        }
+        state.token = state.token || action.payload.user.token || null;
       }
       return state;
     });
     builder.addCase(HYDRATE, (state, action: any) => {
-      if (action.payload.user.user?.saved) {
-        state.user = {
-          name: state.user?.name || "",
-          email: state.user?.email || "",
-          admin: state.user?.admin || false,
-          lessons: state.user?.lessons || [],
-          saved: action.payload.user.user.saved,
-        };
+      if (action.payload.user.user) {
+        state.user = action.payload.user.user;
+      }
+      if (action.payload.user.token) {
+        state.token = action.payload.user.token;
       }
       return state;
     });

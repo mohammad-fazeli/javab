@@ -18,6 +18,7 @@ import ListItem from "../../components/ListItem";
 import Modal from "../../components/Modal";
 import Button from "../../components/Button";
 import Loading from "../../components/Loading";
+import { handleErrorServerSide } from "../../store/utils/handleError";
 
 const Lessons: NextPage = () => {
   const router = useRouter();
@@ -93,16 +94,12 @@ const Lessons: NextPage = () => {
         });
       })
       .catch((err: any) => {
-        console.log("🚀 ~ file: lesson.tsx ~ line 42 ~ err", err);
         toast(err.message, {
           position: "top-right",
           type: "error",
           rtl: true,
           theme: "colored",
         });
-        if (err.status === 401) {
-          router.push("/login?redirect=lesson");
-        }
       });
   };
 
@@ -220,13 +217,13 @@ const Lessons: NextPage = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) => async (context) => {
+    const token = context.req.headers.cookie?.replace("token=", "") || "";
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/lesson`,
         {
           headers: {
-            authorization:
-              context.req.headers.cookie?.replace("token=", "") || "",
+            authorization: token,
           },
         }
       );
@@ -237,13 +234,22 @@ export const getServerSideProps = wrapper.getServerSideProps(
         })
       );
     } catch (err: any) {
-      if (err.response?.status === 401) {
+      const response = await handleErrorServerSide(err, token, store);
+      if (response === 401) {
         return {
           redirect: {
-            destination: "/login?redirect=lesson",
+            destination: "/login?redirect=lesson/",
             permanent: false,
           },
         };
+      }
+      if (typeof response != "number") {
+        store.dispatch(
+          setState({
+            title: response.data.title || "",
+            items: response.data.data,
+          })
+        );
       }
     }
     return {

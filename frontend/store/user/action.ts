@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../store";
+import { handleError } from "../utils/handleError";
 
 export const register = createAsyncThunk(
   "User/",
@@ -16,8 +17,8 @@ export const register = createAsyncThunk(
         body
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -29,8 +30,8 @@ export const verify = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user/verify/${token}`
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -50,11 +51,27 @@ export const login = createAsyncThunk(
         body
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );
+export const refresh = createAsyncThunk("User/login", async (arg, ThunkAPI) => {
+  try {
+    const token = (ThunkAPI.getState() as RootState).user.token;
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user/refresh`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    return handleError(error, ThunkAPI);
+  }
+});
 export const forgotPassword = createAsyncThunk(
   "User/",
   async (email: string, ThunkAPI) => {
@@ -63,8 +80,8 @@ export const forgotPassword = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user/forgot-password/${email}`
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -84,8 +101,8 @@ export const resetPassword = createAsyncThunk(
         body
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -117,8 +134,8 @@ export const changePassword = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -140,8 +157,8 @@ export const deleteAccount = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -160,8 +177,8 @@ export const addSaved = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );
@@ -179,8 +196,8 @@ export const removeSaved = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (err: any) {
-      return ThunkAPI.rejectWithValue(err.response.data);
+    } catch (error: any) {
+      return handleError(error, ThunkAPI);
     }
   }
 );

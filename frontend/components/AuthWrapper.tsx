@@ -18,10 +18,10 @@ const AuthWrapper: React.FC<IProps> = ({ children, isAdmin = false }) => {
   });
   useEffect(() => {
     if (!state.isLoggedIn) {
-      router.push("/login?redirect=lesson");
+      router.push(`/login?redirect=${router.pathname}`);
     }
     if (isAdmin && !state.isAdmin) {
-      router.push("/login?redirect=lesson");
+      router.push(`/login?redirect=${router.pathname}`);
     }
   }, [isAdmin, router, state]);
   return <>{children}</>;

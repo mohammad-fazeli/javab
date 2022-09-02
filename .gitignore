@@ -1,6 +1,7 @@
 /backend/.env
 /backend/node_modules
 /backend/build
+/backend/data
 /backend/public/files/practice/*.jpg
 /backend/public/files/practice/*.jpeg
 /backend/public/files/practice/*.png

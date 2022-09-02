@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import ListItem from "../../components/ListItem";
 import AddPracticeForm from "../../components/AddPracticeForm";
 import Loading from "../../components/Loading";
+import { handleErrorServerSide } from "../../store/utils/handleError";
 
 const Lesson: NextPage = () => {
   const router = useRouter();
@@ -167,13 +168,13 @@ const Lesson: NextPage = () => {
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) => async (context) => {
     const id = context.query.id;
-    const token = context.req.headers.cookie?.replace("token=", "");
+    const token = context.req.headers.cookie?.replace("token=", "") || "";
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/lesson/${id}`,
         {
           headers: {
-            authorization: token || "",
+            authorization: token,
           },
         }
       );
@@ -183,25 +184,34 @@ export const getServerSideProps = wrapper.getServerSideProps(
           items: response.data.data,
         })
       );
-      return {
-        props: {},
-      };
     } catch (err: any) {
-      if (err.response?.status === 401) {
+      const response = await handleErrorServerSide(err, token, store);
+      if (response === 401) {
         return {
           redirect: {
             destination: `/login?redirect=lesson/${id}`,
             permanent: false,
           },
         };
+      } else if (typeof response != "number") {
+        store.dispatch(
+          setState({
+            title: response.data.title || "",
+            items: response.data.data,
+          })
+        );
+      } else {
+        return {
+          redirect: {
+            destination: "/lesson",
+            permanent: false,
+          },
+        };
       }
-      return {
-        redirect: {
-          destination: "/lesson",
-          permanent: false,
-        },
-      };
     }
+    return {
+      props: {},
+    };
   }
 );
 

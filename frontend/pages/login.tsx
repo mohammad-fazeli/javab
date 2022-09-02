@@ -24,7 +24,6 @@ const Login: NextPage = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const router = useRouter();
   const redirect = router.query.redirect;
-
   useEffect(() => {
     if (redirect) {
       removeCookie("token");

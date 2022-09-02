@@ -5,7 +5,7 @@ import { client } from "../db";
 
 export const signToken = async (
   user: UserDocument,
-  expiresIn: string = "24h"
+  expiresIn: string = "32h"
 ) => {
   const token = jwt.sign(
     {
@@ -52,12 +52,36 @@ export const isAuth = (req: any, res: Response, next: NextFunction) => {
       }
       const user = await client.get(decoded._id);
       if (!user) {
+        return res.status(403).json({
+          status: 403,
+          message: "token is not valid",
+        });
+      }
+      req.user = JSON.parse(user);
+      next();
+    }
+  );
+};
+
+export const isAuthRefresh = (req: any, res: Response, next: NextFunction) => {
+  const { authorization } = req.headers;
+  if (!authorization) {
+    return res.status(401).json({
+      status: 401,
+      message: "token is not provided",
+    });
+  }
+  jwt.verify(
+    authorization.replace("Bearer ", ""),
+    process.env.JWT_SECRET as string,
+    async (err: any, decoded: any) => {
+      if (err) {
         return res.status(401).json({
           status: 401,
           message: "token is not valid",
         });
       }
-      req.user = JSON.parse(user);
+      req.user = decoded;
       next();
     }
   );

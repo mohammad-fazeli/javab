@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../store";
+import { handleError } from "../utils/handleError";
 
 export const addPractices = createAsyncThunk(
   "items/",
@@ -18,7 +19,7 @@ export const addPractices = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, thunkAPI);
     }
   }
 );
@@ -40,7 +41,7 @@ export const updateTitlePractice = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, thunkAPI);
     }
   }
 );
@@ -62,7 +63,7 @@ export const updatePractice = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, thunkAPI);
     }
   }
 );
@@ -81,7 +82,7 @@ export const deletePractice = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return handleError(error, thunkAPI);
     }
   }
 );

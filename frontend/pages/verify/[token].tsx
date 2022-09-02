@@ -22,7 +22,7 @@ const Verify: NextPage<IProps> = ({ message, error, user, token }) => {
   useEffect(() => {
     if (user) {
       setCookie("token", token, { path: "/", maxAge: 60 * 60 * 24 });
-      dispatch(setUser(user));
+      dispatch(setUser({ user, token }));
       router.push("/lesson");
     }
   }, [dispatch, router, setCookie, token, user]);

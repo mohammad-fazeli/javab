@@ -1,6 +1,6 @@
 import { Router } from "express";
 import validateRequest from "../middleware/validateRequest";
-import { isAdmin, isAuth } from "../utils/auth";
+import { isAdmin, isAuth, isAuthRefresh } from "../utils/auth";
 //import schema for validation
 import {
   registerUserSchema,
@@ -26,6 +26,7 @@ import {
   setLessonToUser,
   getLessons,
   getAllUsers,
+  refreshToken,
 } from "../controller/user.controller";
 
 const router = Router();
@@ -63,4 +64,5 @@ router.post(
 );
 router.get("/lessons/:userId", isAuth, isAdmin, getLessons);
 router.get("/", isAuth, isAdmin, getAllUsers);
+router.get("/refresh", isAuthRefresh, refreshToken);
 export default router;

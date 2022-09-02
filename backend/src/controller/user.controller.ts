@@ -208,7 +208,7 @@ export const deleteAccount = async (req: any, res: Response) => {
   try {
     const { password } = req.body;
     const user = await userService.delete(req.user._id, password);
-    await client.del(user._id);
+    await client.del(user._id.toString());
     res.status(200).json({
       status: 200,
       message: "حساب کاربری شما با موفقیت حذف شد",
@@ -356,6 +356,29 @@ export const getAllUsers = async (req: Request, res: Response) => {
       status: 200,
       message: "کاربران با موفقیت ارسال شد",
       data: users,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      status: 500,
+      message: "خطایی رخ داده است",
+    });
+  }
+};
+
+export const refreshToken = async (req: any, res: Response) => {
+  try {
+    const user = await userService.findOneById(req.user._id);
+    const token = await signToken(user);
+    res.status(200).json({
+      status: 200,
+      message: "ورود با موفقیت انجام شد",
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+        admin: user.admin,
+        lessons: user.lessons,
+      },
     });
   } catch (err: any) {
     res.status(500).json({

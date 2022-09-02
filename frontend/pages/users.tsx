@@ -8,6 +8,7 @@ import { setUsers } from "../store/users/slice";
 import { useSelector } from "react-redux";
 import Loading from "../components/Loading";
 import UserLessonsForm from "../components/UserLessonsForm";
+import { handleErrorServerSide } from "../store/utils/handleError";
 
 const Users: NextPage = () => {
   const ReduxState = useSelector((state: RootState) => {
@@ -89,25 +90,29 @@ const Users: NextPage = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) => async (context) => {
+    const token = context.req.headers.cookie?.replace("token=", "") || "";
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user/`,
         {
           headers: {
-            authorization:
-              context.req.headers.cookie?.replace("token=", "") || "",
+            authorization: token,
           },
         }
       );
       store.dispatch(setUsers(response.data.data));
     } catch (err: any) {
-      if (err.response?.status === 401) {
+      const response = await handleErrorServerSide(err, token, store);
+      if (response === 401) {
         return {
           redirect: {
-            destination: "/login?redirect=lesson",
+            destination: "/login?redirect=lesson/",
             permanent: false,
           },
         };
+      }
+      if (typeof response != "number") {
+        store.dispatch(setUsers(response.data.data));
       }
     }
     return {
