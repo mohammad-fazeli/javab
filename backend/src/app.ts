@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { connectToMongodb, connectToRedis } from "./db";
+import errorhandler from "./middleware/errorhandler";
 //import routers
 import userRouter from "./router/user.router";
 import lessonRouter from "./router/lesson.router";
@@ -25,6 +26,7 @@ app.use("/api/lesson", lessonRouter);
 app.use("/api/practice", practiceRouter);
 app.use("/api/answer", answerRouter);
 app.use("/api/comment", commentRouter);
+app.use(errorhandler);
 connectToMongodb()
   .then(() => {
     connectToRedis()

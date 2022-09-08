@@ -1,7 +1,12 @@
-import { Request, Response } from "express";
+import { Response, NextFunction } from "express";
+import { Request } from "../types/request";
 import commentService from "../services/comment.service";
 
-export const addComment = async (req: any, res: Response) => {
+export const addComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { answer_id, content, parent } = req.body;
     if (!answer_id && !parent) {
@@ -14,7 +19,7 @@ export const addComment = async (req: any, res: Response) => {
       {
         content,
         parent,
-        createdBy: req.user.name,
+        createdBy: req.user?.name as string,
       },
       answer_id
     );
@@ -24,26 +29,22 @@ export const addComment = async (req: any, res: Response) => {
       data: answers,
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const editComment = async (req: any, res: Response) => {
+export const editComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
     const answers = await commentService.editComment(
       content,
-      req.user.name,
+      req.user?.name as string,
       id
     );
     res.status(200).json({
@@ -52,38 +53,29 @@ export const editComment = async (req: any, res: Response) => {
       data: answers,
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const deleteComment = async (req: any, res: Response) => {
+export const deleteComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
-    const answers = await commentService.deleteComment(req.user.name, id);
+    const answers = await commentService.deleteComment(
+      req.user?.name as string,
+      id
+    );
     res.status(200).json({
       status: 200,
       message: "نظر با موفقیت حذف شد",
       data: answers,
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };

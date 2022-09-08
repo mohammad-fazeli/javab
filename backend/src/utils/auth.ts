@@ -1,4 +1,5 @@
 import { Response, NextFunction } from "express";
+import { Request } from "../types/request";
 import jwt from "jsonwebtoken";
 import { UserDocument } from "../model/user.model";
 import { client } from "../db";
@@ -32,7 +33,7 @@ export const signToken = async (
   return token;
 };
 
-export const isAuth = (req: any, res: Response, next: NextFunction) => {
+export const isAuth = (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
   if (!authorization) {
     return res.status(401).json({
@@ -63,7 +64,11 @@ export const isAuth = (req: any, res: Response, next: NextFunction) => {
   );
 };
 
-export const isAuthRefresh = (req: any, res: Response, next: NextFunction) => {
+export const isAuthRefresh = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { authorization } = req.headers;
   if (!authorization) {
     return res.status(401).json({
@@ -87,8 +92,8 @@ export const isAuthRefresh = (req: any, res: Response, next: NextFunction) => {
   );
 };
 
-export const isAdmin = (req: any, res: Response, next: NextFunction) => {
-  if (!req.user.admin) {
+export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user?.admin) {
     return res.status(401).json({
       status: 401,
       message: "شما اجازه دسترسی به این بخش را ندارید",

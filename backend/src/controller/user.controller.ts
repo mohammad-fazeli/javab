@@ -1,11 +1,16 @@
-import { Request, Response } from "express";
+import { Response, NextFunction } from "express";
+import { Request } from "../types/request";
 import userService from "../services/user.service";
 import emailService from "../services/email.service";
 import lessonService from "../services/lesson.service";
 import { signToken } from "../utils/auth";
 import { client } from "../db";
 
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const user = await userService.create(req.body);
     emailService.sendVerificationEmail(user.email, (err) => {
@@ -29,14 +34,16 @@ export const signup = async (req: Request, res: Response) => {
         message: `${err.keyPattern.name ? "نام کاربری" : "ایمیل"} تکراری است`,
       });
     }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const verify = async (req: Request, res: Response) => {
+export const verify = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   emailService.verifyVerificationEmail(
     req.params.token,
     async (err, decoded) => {
@@ -61,29 +68,19 @@ export const verify = async (req: Request, res: Response) => {
             },
           });
         } catch (err: any) {
-          if (err.code === 404) {
-            return res.status(404).json({
-              status: 404,
-              message: "کاربری یافت نشد",
-            });
-          }
-          if (err.code === 400) {
-            return res.status(400).json({
-              status: 400,
-              message: "حساب کاربری شما قبلا تایید شده است",
-            });
-          }
-          res.status(500).json({
-            status: 500,
-            message: "خطایی رخ داده است",
-          });
+          req.error = err;
+          next();
         }
       }
     }
   );
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { email, password } = req.body;
   try {
     const user = await userService.login(email, password);
@@ -100,21 +97,16 @@ export const login = async (req: Request, res: Response) => {
       },
     });
   } catch (err: any) {
-    console.log("🚀 ~ file: user.controller.ts ~ line 102 ~ err", err);
-    if (err.code === 401) {
-      return res.status(401).json({
-        status: 401,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const forgotPassword = async (req: Request, res: Response) => {
+export const forgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const email = req.params.email;
   try {
     const user = await userService.findOneByEmail(email);
@@ -132,20 +124,16 @@ export const forgotPassword = async (req: Request, res: Response) => {
       }
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: "کاربری با این ایمیل یافت نشد",
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const resetPassword = async (req: Request, res: Response) => {
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { token, password } = req.body;
   emailService.verifyForgotPassword(token, async (err, info) => {
     if (err) {
@@ -161,139 +149,119 @@ export const resetPassword = async (req: Request, res: Response) => {
           message: "رمز شما با موفقیت تغییر یافت",
         });
       } catch (err: any) {
-        if (err.code === 404) {
-          return res.status(404).json({
-            status: 404,
-            message: "کاربری با این ایمیل یافت نشد",
-          });
-        }
-        res.status(500).json({
-          status: 500,
-          message: "خطایی رخ داده است",
-        });
+        req.error = err;
+        next();
       }
     }
   });
 };
 
-export const changePassword = async (req: any, res: Response) => {
+export const changePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { oldPassword, newPassword } = req.body;
   try {
-    await userService.changePassword(req.user._id, oldPassword, newPassword);
+    await userService.changePassword(
+      req.user?._id as string,
+      oldPassword,
+      newPassword
+    );
     res.status(200).json({
       status: 200,
       message: "رمز شما با موفقیت تغییر یافت",
     });
   } catch (err: any) {
-    if (err.code === 401) {
-      return res.status(401).json({
-        status: 401,
-        message: "رمز عبور قدیمی شما اشتباه است",
-      });
-    }
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: "کاربری با این ایمیل یافت نشد",
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const deleteAccount = async (req: any, res: Response) => {
+export const deleteAccount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { password } = req.body;
-    const user = await userService.delete(req.user._id, password);
+    const user = await userService.delete(req.user?._id as string, password);
     await client.del(user._id.toString());
     res.status(200).json({
       status: 200,
       message: "حساب کاربری شما با موفقیت حذف شد",
     });
   } catch (err: any) {
-    if (err.code === 404 || err.code === 401) {
-      return res.status(err.code).json({
-        status: err.code,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const addSavedPractice = async (req: any, res: Response) => {
+export const addSavedPractice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
-    const saved = await userService.addSavedPractice(req.user._id, id);
+    const saved = await userService.addSavedPractice(
+      req.user?._id as string,
+      id
+    );
     res.status(200).json({
       status: 200,
       message: "تمرین با موفقیت ذخیره شد",
       data: saved,
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
-export const removeSavedPractice = async (req: any, res: Response) => {
+export const removeSavedPractice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
-    const saved = await userService.removeSavedPractice(req.user._id, id);
+    const saved = await userService.removeSavedPractice(
+      req.user?._id as string,
+      id
+    );
     res.status(200).json({
       status: 200,
       message: "تمرین با موفقیت از ذخیره ها حذف شد",
       data: saved,
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
-export const getSavedPractices = async (req: any, res: Response) => {
+export const getSavedPractices = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const saved = await userService.getSavedPractices(req.user._id);
+    const saved = await userService.getSavedPractices(req.user?._id as string);
     res.status(200).json({
       status: 200,
       message: "تمرینات ذخیره شده با موفقیت ارسال شد",
       data: saved,
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const setLessonToUser = async (req: Request, res: Response) => {
+export const setLessonToUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { userId, lessonsId } = req.body;
     await userService.setLessons(userId, lessonsId);
@@ -303,20 +271,16 @@ export const setLessonToUser = async (req: Request, res: Response) => {
       message: "درس با موفقیت به کاربر اضافه شد",
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const getLessons = async (req: Request, res: Response) => {
+export const getLessons = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { userId } = req.params;
     const lessons = await lessonService.getAll();
@@ -336,20 +300,16 @@ export const getLessons = async (req: Request, res: Response) => {
       },
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const users = await userService.getAll();
     res.status(200).json({
@@ -358,16 +318,18 @@ export const getAllUsers = async (req: Request, res: Response) => {
       data: users,
     });
   } catch (err: any) {
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const refreshToken = async (req: any, res: Response) => {
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const user = await userService.findOneById(req.user._id);
+    const user = await userService.findOneById(req.user?._id);
     const token = await signToken(user);
     res.status(200).json({
       status: 200,
@@ -381,9 +343,7 @@ export const refreshToken = async (req: any, res: Response) => {
       },
     });
   } catch (err: any) {
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };

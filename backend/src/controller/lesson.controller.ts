@@ -1,7 +1,12 @@
-import { Request, Response } from "express";
+import { Response, NextFunction } from "express";
+import { Request } from "../types/request";
 import lessonService from "../services/lesson.service";
 
-export const getAllLessons = async (req: Request, res: Response) => {
+export const getAllLessons = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const lessons = await lessonService.getAll();
     res.status(200).json({
@@ -10,14 +15,16 @@ export const getAllLessons = async (req: Request, res: Response) => {
       data: lessons,
     });
   } catch (err: any) {
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const addLesson = async (req: Request, res: Response) => {
+export const addLesson = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { title } = req.body;
     const lessons = await lessonService.create(title);
@@ -27,14 +34,16 @@ export const addLesson = async (req: Request, res: Response) => {
       data: lessons,
     });
   } catch (err: any) {
-    res.status(500).json({
-      status: 500,
-      message: "خطایی در سرور رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const editLesson = async (req: Request, res: Response) => {
+export const editLesson = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const lessons = await lessonService.edit(req.params.id, req.body.title);
     res.status(200).json({
@@ -43,20 +52,16 @@ export const editLesson = async (req: Request, res: Response) => {
       data: lessons,
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی در سرور رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const deleteLesson = async (req: Request, res: Response) => {
+export const deleteLesson = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const lessons = await lessonService.delete(req.params.id);
     res.status(200).json({
@@ -65,15 +70,7 @@ export const deleteLesson = async (req: Request, res: Response) => {
       data: lessons,
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی در سرور رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };

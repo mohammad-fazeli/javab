@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { Response, NextFunction } from "express";
+import { Request } from "../types/request";
 import practiceService from "../services/practice.service";
 import userService from "../services/user.service";
 import answerService from "../services/answer.service";
@@ -6,7 +7,11 @@ import mongoose from "mongoose";
 import { removeFile } from "../utils/removeFile";
 import { compress } from "../utils/resizeImage";
 
-export const getPractices = async (req: Request, res: Response) => {
+export const getPractices = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
 
@@ -17,23 +22,19 @@ export const getPractices = async (req: Request, res: Response) => {
       ...practices,
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: "درسی یافت نشد",
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const getPractice = async (req: any, res: Response) => {
+export const getPractice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
-    const viewerId = req.user._id;
+    const viewerId = req.user?._id as string;
     const practice = await practiceService.getOne(id, viewerId);
     const answers = await answerService.getAll(id);
     res.status(200).json({
@@ -45,24 +46,20 @@ export const getPractice = async (req: any, res: Response) => {
       },
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const createPractice = async (req: any, res: Response) => {
+export const createPractice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { title, question, description, lesson } = req.body;
   const file = req.file;
   try {
-    const user = await userService.findOneByEmail(req.user.email);
+    const user = await userService.findOneByEmail(req.user?.email as string);
     if (
       user.admin ||
       user.lessons.includes(new mongoose.Types.ObjectId(lesson))
@@ -90,26 +87,22 @@ export const createPractice = async (req: any, res: Response) => {
     });
   } catch (err: any) {
     if (file) removeFile(`/public/files/practice/${file.filename}`);
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: "درس مورد نظر یافت نشد",
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const editPractice = async (req: any, res: Response) => {
+export const editPractice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { id } = req.params;
   const { title, question, description } = req.body;
 
   const file = req.file;
   try {
-    const user = await userService.findOneByEmail(req.user.email);
+    const user = await userService.findOneByEmail(req.user?.email as string);
     const practice = await practiceService.getOne(id, user._id);
 
     if (user.admin || user.lessons.includes(practice.lesson)) {
@@ -133,24 +126,20 @@ export const editPractice = async (req: any, res: Response) => {
       message: "شما دسترسی لازم برای این درس را ندارید",
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: "تمرین یافت نشد",
-      });
-    }
     if (file) removeFile(`/public/files/practice/${file.filename}`);
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
 
-export const deletePractice = async (req: any, res: Response) => {
+export const deletePractice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
-    const user = await userService.findOneByEmail(req.user.email);
+    const user = await userService.findOneByEmail(req.user?.email as string);
     const practice = await practiceService.getOne(id, user._id);
     if (user.admin || user.lessons.includes(practice.lesson)) {
       const practices = await practiceService.delete(id);
@@ -165,15 +154,7 @@ export const deletePractice = async (req: any, res: Response) => {
       message: "شما دسترسی لازم برای این درس را ندارید",
     });
   } catch (err: any) {
-    if (err.code === 404) {
-      return res.status(404).json({
-        status: 404,
-        message: "تمرین یافت نشد",
-      });
-    }
-    res.status(500).json({
-      status: 500,
-      message: "خطایی رخ داده است",
-    });
+    req.error = err;
+    next();
   }
 };
