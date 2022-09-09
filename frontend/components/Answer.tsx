@@ -99,7 +99,7 @@ const Answer: React.FC<IProps> = ({ answer }) => {
           });
         }}
         onSubmit={handleEdit}
-        defaultDescription={answer.description}
+        defaultValue={{ description: answer.description, file: answer.file }}
       />
       <div className="flex justify-between gap-2.5 border-b border-b-[#E1E1E1] dark:border-b-[#3D494C] pb-2 mt-5 w-full">
         <div className="w-full">

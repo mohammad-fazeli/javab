@@ -21,31 +21,41 @@ export class Answer {
     await newAnswer.save();
     return await this.getAll(answer.practice_id);
   }
-  async edit(answer: {
-    createdBy: string;
-    answer_id: string;
-    file?: string;
-    description?: string;
-  }) {
-    const answerToEdit = await this.Answer.findOneAndUpdate(
-      {
-        _id: answer.answer_id,
-        createdBy: answer.createdBy, //check answer for user
-      },
-      {
-        file: answer.file,
-        description: answer.description,
-      }
-    );
+  async edit(
+    answer: {
+      createdBy: string;
+      answer_id: string;
+      file?: string;
+      description?: string;
+    },
+    deleteFile = false
+  ) {
+    const file = deleteFile && !answer.file ? "" : answer.file;
+    const answerToEdit = await this.Answer.findOne({
+      _id: answer.answer_id,
+      createdBy: answer.createdBy, //check answer for user
+    });
     if (!answerToEdit) {
       throw {
         code: 404,
         message: "پاسخ یافت نشد",
       };
     }
-    if (answer.file) {
-      removeFile(`/public/files/practice/${answerToEdit.file}`);
+    if (!answerToEdit.description && !answer.description && deleteFile) {
+      throw {
+        code: 400,
+        message: "پاسخ نمی تواند بدون فایل یا توضیح باشد.",
+      };
     }
+    if (file !== undefined) {
+      if (answerToEdit.file)
+        removeFile(`/public/files/practice/${answerToEdit.file}`);
+      answerToEdit.file = file;
+    }
+    if (answer.description !== undefined) {
+      answerToEdit.description = answer.description;
+    }
+    await answerToEdit.save();
     return await this.getAll(answerToEdit.practice_id);
   }
   async delete(_id: string, createdBy: string) {

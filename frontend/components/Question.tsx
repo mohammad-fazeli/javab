@@ -137,6 +137,7 @@ const Question: React.FC<IProps> = ({ canEdit, practice }) => {
           title: practice.title,
           question: practice.question,
           description: practice.description,
+          file: practice.file,
         }}
       />
       <AddAnswerForm

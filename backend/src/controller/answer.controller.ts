@@ -44,19 +44,22 @@ export const editAnswer = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { description } = req.body;
+  const { description, deleteFile } = req.body;
   const { answer_id } = req.params;
   const file = req.file;
   try {
     if (file) {
       await compress(file.filename);
     }
-    const answers = await answerService.edit({
-      createdBy: req.user?.name as string,
-      answer_id,
-      description,
-      file: file ? file.filename : undefined,
-    });
+    const answers = await answerService.edit(
+      {
+        createdBy: req.user?.name as string,
+        answer_id,
+        description,
+        file: file ? file.filename : undefined,
+      },
+      deleteFile ? true : false
+    );
     res.status(200).json({
       status: 200,
       message: "پاسخ با موفقیت ویرایش شد",

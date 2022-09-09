@@ -98,7 +98,7 @@ export const editPractice = async (
   next: NextFunction
 ) => {
   const { id } = req.params;
-  const { title, question, description } = req.body;
+  const { title, question, description, deleteFile } = req.body;
 
   const file = req.file;
   try {
@@ -109,12 +109,16 @@ export const editPractice = async (
       if (file) {
         await compress(file.filename);
       }
-      const practices = await practiceService.edit(id, {
-        title,
-        question,
-        description,
-        file: file ? file.filename : undefined,
-      });
+      const practices = await practiceService.edit(
+        id,
+        {
+          title,
+          question,
+          description,
+          file: file ? file.filename : undefined,
+        },
+        deleteFile ? true : false
+      );
       return res.status(200).json({
         status: 200,
         message: "تمرین با موفقیت ویرایش شد",

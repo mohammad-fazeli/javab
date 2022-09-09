@@ -50,11 +50,13 @@ class Practice {
       question?: string;
       file?: string;
       description?: string;
-    }
+    },
+    deleteFile = false
   ) {
+    const file = deleteFile && !practice.file ? null : practice.file;
     const practiceToEdit = await this.practiceModel.findOneAndUpdate(
       { _id: id },
-      practice
+      { ...practice, file }
     );
     if (!practiceToEdit) {
       throw {
@@ -62,7 +64,7 @@ class Practice {
         message: "تمرین یافت نشد",
       };
     }
-    if (practice.file) {
+    if ((practice.file || deleteFile) && practiceToEdit.file) {
       removeFile(`/public/files/practice/${practiceToEdit.file}`);
     }
     return await this.getAll(practiceToEdit.lesson.toString());

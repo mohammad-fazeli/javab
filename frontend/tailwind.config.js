@@ -10,6 +10,9 @@ module.exports = {
       fontFamily: {
         IRANYekan: ["IRANYekan", "sans-serif"],
       },
+      gridTemplateColumns: {
+        form: "max-content auto",
+      },
     },
   },
   plugins: [],
