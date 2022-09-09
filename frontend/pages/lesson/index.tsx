@@ -60,9 +60,6 @@ const Lessons: NextPage = () => {
               rtl: true,
               theme: "colored",
             });
-            if (err.status === 401) {
-              router.push("/login?redirect=lesson");
-            }
           });
         formRef.current?.reset();
         setState((prevState) => {
@@ -122,9 +119,6 @@ const Lessons: NextPage = () => {
           rtl: true,
           theme: "colored",
         });
-        if (err.status === 401) {
-          router.push("/login?redirect=lesson");
-        }
       });
   };
 

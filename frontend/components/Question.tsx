@@ -50,9 +50,6 @@ const Question: React.FC<IProps> = ({ canEdit, practice }) => {
           toast(err.message, {
             type: "error",
           });
-          if (err.status === 401) {
-            router.push(`/login?redirect=practice/${practice._id}`);
-          }
         });
     }
   };
@@ -68,9 +65,6 @@ const Question: React.FC<IProps> = ({ canEdit, practice }) => {
         toast(err.message, {
           type: "error",
         });
-        if (err.status === 401) {
-          router.push(`/login?redirect=practice/${practice._id}`);
-        }
       });
     setState((prevState) => {
       return {
@@ -92,9 +86,6 @@ const Question: React.FC<IProps> = ({ canEdit, practice }) => {
         toast(err.message, {
           type: "error",
         });
-        if (err.status === 401) {
-          router.push(`/login?redirect=practice/${practice._id}`);
-        }
       });
   };
 
@@ -111,9 +102,6 @@ const Question: React.FC<IProps> = ({ canEdit, practice }) => {
         toast(err.message, {
           type: "error",
         });
-        if (err.status === 401) {
-          router.push(`/login?redirect=practice/${practice._id}`);
-        }
       });
     setState((prevState) => ({
       ...prevState,

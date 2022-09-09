@@ -51,9 +51,6 @@ const Answer: React.FC<IProps> = ({ answer }) => {
           toast(err.message, {
             type: "error",
           });
-          if (err.status === 401) {
-            router.push(`/login?redirect=practice/${answer.practice_id}`);
-          }
         });
   };
 
@@ -69,9 +66,6 @@ const Answer: React.FC<IProps> = ({ answer }) => {
         toast(err.message, {
           type: "error",
         });
-        if (err.status === 401) {
-          router.push(`/login?redirect=practice/${answer.practice_id}`);
-        }
       });
     setState((prevState) => ({
       ...prevState,
