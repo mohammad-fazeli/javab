@@ -16,6 +16,7 @@ import Button from "./Button";
 import Text from "./Text";
 import { useRouter } from "next/router";
 import CommentList from "./CommentList";
+import ReactLoading from "react-loading";
 
 interface IProps {
   answer: answer;
@@ -25,6 +26,7 @@ const Answer: React.FC<IProps> = ({ answer }) => {
   const [state, setState] = useState({
     openEdit: false,
     showComment: false,
+    showRateLoading: false,
   });
   const date = new Date(answer.createdAt);
   const dateString = date.toLocaleDateString("fa-IR");
@@ -73,11 +75,15 @@ const Answer: React.FC<IProps> = ({ answer }) => {
     }));
   };
 
-  const handleIncreaseRate = () => {
-    dispatch(increaseRate(answer._id) as any);
+  const handleIncreaseRate = async () => {
+    setState((prevState) => ({ ...prevState, showRateLoading: true }));
+    await dispatch(increaseRate(answer._id) as any);
+    setState((prevState) => ({ ...prevState, showRateLoading: false }));
   };
-  const handleDecreaseRate = () => {
-    dispatch(decreaseRate(answer._id) as any);
+  const handleDecreaseRate = async () => {
+    setState((prevState) => ({ ...prevState, showRateLoading: true }));
+    await dispatch(decreaseRate(answer._id) as any);
+    setState((prevState) => ({ ...prevState, showRateLoading: false }));
   };
 
   return (
@@ -183,7 +189,17 @@ const Answer: React.FC<IProps> = ({ answer }) => {
             </div>
           )}
         </div>
-        <div className="min-w-fit pt-16 text-center text-xl">
+        <div className="min-w-fit pt-16 text-center text-xl relative">
+          {state.showRateLoading && (
+            <div className="absolute w-full h-16 flex justify-center items-center">
+              <ReactLoading
+                type="balls"
+                color="#e3364e"
+                height="35px"
+                width="35px"
+              />
+            </div>
+          )}
           <div
             className="border-l-[18px] border-r-[18px] border-b-[18px] border-b-slate-700 dark:border-b-gray-400 border-l-transparent border-r-transparent"
             onClick={handleIncreaseRate}
