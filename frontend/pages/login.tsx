@@ -59,7 +59,7 @@ const Login: NextPage = () => {
           rtl: true,
           theme: "colored",
         });
-        router.push(`/${redirect || "lesson"}`);
+        router.push(`${redirect || "lesson"}`);
       })
       .catch((err: any) => {
         toast(err.message, {
