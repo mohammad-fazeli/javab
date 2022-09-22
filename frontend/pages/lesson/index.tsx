@@ -18,7 +18,7 @@ import ListItem from "../../components/ListItem";
 import Modal from "../../components/Modal";
 import Button from "../../components/Button";
 import Loading from "../../components/Loading";
-import { handleErrorServerSide } from "../../store/utils/handleError";
+import { handleErrorServerSide } from "../../utils/handleError";
 
 const Lessons: NextPage = () => {
   const router = useRouter();

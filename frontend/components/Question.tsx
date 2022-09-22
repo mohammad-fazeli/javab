@@ -59,7 +59,7 @@ const Question: React.FC<IProps> = ({ canEdit, practice }) => {
     dispatch(updatePractice(formData) as any)
       .unwrap()
       .then((res: any) => {
-        router.reload();
+        router.replace(router.asPath);
       })
       .catch((err: any) => {
         toast(err.message, {

@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import ListItem from "../../components/ListItem";
 import AddPracticeForm from "../../components/AddPracticeForm";
 import Loading from "../../components/Loading";
-import { handleErrorServerSide } from "../../store/utils/handleError";
+import { handleErrorServerSide } from "../../utils/handleError";
 
 const Lesson: NextPage = () => {
   const router = useRouter();
@@ -28,6 +28,7 @@ const Lesson: NextPage = () => {
       title: state.items.title,
       userLessons: state.user.user?.lessons || [],
       isAdmin: state.user.user?.admin || false,
+      uploadPercent: state.items.uploadPercent,
       pending: state.items.pending,
     };
   });
@@ -85,7 +86,6 @@ const Lesson: NextPage = () => {
         });
       })
       .catch((err: any) => {
-        console.log("🚀 ~ file: lesson.tsx ~ line 42 ~ err", err);
         toast(err.message, {
           position: "top-right",
           type: "error",
@@ -107,7 +107,6 @@ const Lesson: NextPage = () => {
         });
       })
       .catch((err: any) => {
-        console.log("🚀 ~ file: lesson.tsx ~ line 42 ~ err", err);
         toast(err.message, {
           position: "top-right",
           type: "error",
@@ -122,7 +121,7 @@ const Lesson: NextPage = () => {
       <Head>
         <title>{ReduxState.title}</title>
       </Head>
-      {ReduxState.pending && <Loading />}
+      {ReduxState.pending && <Loading percent={ReduxState.uploadPercent} />}
       <AddPracticeForm
         isOpen={state.addPractice}
         onSubmit={handleAddPractice}

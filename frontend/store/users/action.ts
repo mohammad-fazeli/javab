@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../store";
-import { handleError } from "../utils/handleError";
+import { handleError } from "../../utils/handleError";
 
 export const fetchLessons = createAsyncThunk(
   "users/",

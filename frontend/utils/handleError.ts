@@ -1,7 +1,7 @@
-import { logout, setUser } from "../user/slice";
-import { refresh } from "../user/action";
+import { logout, setUser } from "../store/user/slice";
+import { refresh } from "../store/user/action";
 import axios from "axios";
-import { RootState } from "../store";
+import { RootState } from "../store/store";
 
 export async function handleError(error: any, thunkAPI: any) {
   //Unauthorized code, but you can get a new token

@@ -1,7 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../store";
-import { handleError } from "../utils/handleError";
+import { handleError } from "../../utils/handleError";
+import { setPercent } from "../items/slice";
+import { setPercent as setPercentUpdatePractice } from "./slice";
 
 export const addPractices = createAsyncThunk(
   "items/",
@@ -14,6 +16,11 @@ export const addPractices = createAsyncThunk(
         {
           headers: {
             Authorization: `Bearer ${token}`,
+          },
+          onUploadProgress(progressEvent) {
+            const { loaded, total } = progressEvent;
+            const percent = Math.floor((loaded * 100) / total);
+            thunkAPI.dispatch(setPercent(percent));
           },
         }
       );
@@ -58,6 +65,11 @@ export const updatePractice = createAsyncThunk(
         {
           headers: {
             Authorization: `Bearer ${token}`,
+          },
+          onUploadProgress(progressEvent) {
+            const { loaded, total } = progressEvent;
+            const percent = Math.floor((loaded * 100) / total);
+            thunkAPI.dispatch(setPercentUpdatePractice(percent));
           },
         }
       );

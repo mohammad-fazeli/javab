@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import { wrapper } from "../store/store";
 import axios from "axios";
 import { setSaved } from "../store/user/slice";
-import { handleErrorServerSide } from "../store/utils/handleError";
+import { handleErrorServerSide } from "../utils/handleError";
 
 const Saved: NextPage = () => {
   const dispatch = useDispatch();

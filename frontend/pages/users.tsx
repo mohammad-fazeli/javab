@@ -8,7 +8,7 @@ import { setUsers } from "../store/users/slice";
 import { useSelector } from "react-redux";
 import Loading from "../components/Loading";
 import UserLessonsForm from "../components/UserLessonsForm";
-import { handleErrorServerSide } from "../store/utils/handleError";
+import { handleErrorServerSide } from "../utils/handleError";
 
 const Users: NextPage = () => {
   const ReduxState = useSelector((state: RootState) => {

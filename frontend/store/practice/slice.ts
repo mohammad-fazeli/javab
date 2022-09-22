@@ -1,6 +1,7 @@
 import { createSlice, SerializedError } from "@reduxjs/toolkit";
 import { HYDRATE } from "next-redux-wrapper";
 import { addAnswer, increaseRate } from "../answer/action";
+import { updatePractice } from "./action";
 
 export type practice = {
   _id: string;
@@ -40,6 +41,7 @@ type practiceStateType = {
   practice: practice;
   answers: answer[];
   pending: boolean;
+  uploadPercent: number;
   error: SerializedError | null;
 };
 
@@ -58,6 +60,7 @@ const initialState: practiceStateType = {
   },
   answers: [],
   pending: false,
+  uploadPercent: 0,
   error: null,
 };
 
@@ -69,6 +72,9 @@ const PracticeSlice = createSlice({
       state.practice = action.payload.practice;
       state.answers = action.payload.answers;
     },
+    setPercent: (state, action) => {
+      state.uploadPercent = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(HYDRATE, (state, action: any) => {
@@ -77,6 +83,18 @@ const PracticeSlice = createSlice({
       }
       return state;
     });
+    builder.addCase(updatePractice.pending, (state: practiceStateType) => {
+      state.pending = true;
+      state.error = null;
+    });
+    builder.addCase(updatePractice.fulfilled, (state: practiceStateType) => {
+      state.pending = false;
+      state.uploadPercent = 0;
+    });
+    builder.addCase(updatePractice.rejected, (state: practiceStateType) => {
+      state.pending = false;
+      state.uploadPercent = 0;
+    });
     builder.addCase(addAnswer.pending, (state: practiceStateType) => {
       state.pending = true;
       state.error = null;
@@ -84,10 +102,12 @@ const PracticeSlice = createSlice({
     builder.addCase(addAnswer.fulfilled, (state: practiceStateType, action) => {
       state.pending = false;
       state.answers = action.payload.data;
+      state.uploadPercent = 0;
     });
     builder.addCase(addAnswer.rejected, (state: practiceStateType, action) => {
       state.pending = false;
       state.error = action.error;
+      state.uploadPercent = 0;
     });
     builder.addCase(increaseRate.pending, (state: practiceStateType) => {
       state.error = null;
@@ -106,5 +126,5 @@ const PracticeSlice = createSlice({
     );
   },
 });
-export const { setState } = PracticeSlice.actions;
+export const { setState, setPercent } = PracticeSlice.actions;
 export default PracticeSlice.reducer;

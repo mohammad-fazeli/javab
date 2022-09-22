@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import Loading from "../../components/Loading";
 import Question from "../../components/Question";
 import Answer from "../../components/Answer";
-import { handleErrorServerSide } from "../../store/utils/handleError";
+import { handleErrorServerSide } from "../../utils/handleError";
 
 const Practice: NextPage = () => {
   const router = useRouter();
@@ -22,6 +22,7 @@ const Practice: NextPage = () => {
       lessons: store.user.user?.lessons,
       isAdmin: store.user.user?.admin,
       pending: store.practice.pending,
+      uploadPercent: store.practice.uploadPercent,
     };
   });
   const { id } = router.query;
@@ -34,7 +35,7 @@ const Practice: NextPage = () => {
         <title>{state.practice.title}</title>
       </Head>
       <div>
-        {state.pending && <Loading />}
+        {state.pending && <Loading percent={state.uploadPercent} />}
         <div
           dir="rtl"
           className=" px-4 min-h-[calc(100vh-57px)] md:border md:border-t-0 md:border-b-0 border-[#E1E1E1] dark:md:border-[#3D494C]"
