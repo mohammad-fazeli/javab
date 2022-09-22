@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import AnswerModel, { AnswerDocument } from "../model/answer.model";
 import practiceService from "./practice.service";
-import userService from "./user.service";
 import { removeFile } from "../utils/removeFile";
 
 export class Answer {
@@ -41,7 +40,23 @@ export class Answer {
         message: "پاسخ یافت نشد",
       };
     }
-    if (!answerToEdit.description && !answer.description && deleteFile) {
+    let descriptionExists: boolean;
+    if (answer.description !== "") {
+      descriptionExists = true;
+    } else if (answer.description === "") {
+      descriptionExists = false;
+    } else {
+      descriptionExists = answerToEdit.description ? true : false;
+    }
+    let fileExists: boolean;
+    if (answer.file) {
+      fileExists = true;
+    } else if (deleteFile) {
+      fileExists = false;
+    } else {
+      fileExists = answerToEdit.file ? true : false;
+    }
+    if (!descriptionExists && !fileExists) {
       throw {
         code: 400,
         message: "پاسخ نمی تواند بدون فایل یا توضیح باشد.",
