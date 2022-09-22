@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { formatBytes } from "../utils/formatBytes";
 import Button from "./Button";
 import Modal from "./Modal";
 
@@ -20,18 +21,24 @@ const AddAnswerForm: React.FC<IProps> = ({
 }) => {
   const [state, setState] = useState({
     file: "",
+    fileSize: 0,
     checked: false,
   });
   const formRef = useRef<HTMLFormElement>(null);
   const handleAddAnswer = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formRef.current) {
+    if (formRef.current && state.fileSize < 3100000) {
       const formData = new FormData(formRef.current);
       onSubmit(formData);
     }
   };
+  const cancel = () => {
+    formRef.current?.reset();
+    setState({ checked: false, file: "", fileSize: 0 });
+    onCancel();
+  };
   return (
-    <Modal isOpen={isOpen} onRequestClose={onCancel}>
+    <Modal isOpen={isOpen} onRequestClose={cancel}>
       <form
         dir="rtl"
         onSubmit={handleAddAnswer}
@@ -40,12 +47,13 @@ const AddAnswerForm: React.FC<IProps> = ({
       >
         <div className="w-full grid grid-cols-form gap-2">
           <label htmlFor="file">فایل:</label>
-          <div className="flex flex-col gap-2 md:gap-0 md:flex-row">
+          <div className="flex flex-col gap-2 md:gap-2 md:items-center md:flex-row">
             <input
               onChange={(e) => {
                 setState((prevState) => ({
                   ...prevState,
                   file: e.target.value,
+                  fileSize: e.target.files?.[0]?.size || 0,
                 }));
               }}
               type="file"
@@ -53,6 +61,9 @@ const AddAnswerForm: React.FC<IProps> = ({
               name="file"
               accept="image/png, image/jpeg, image/jpg, application/pdf"
             />
+            {state.fileSize > 0 && (
+              <div>حجم فایل: {formatBytes(state.fileSize)}</div>
+            )}
             {defaultValue?.file && (
               <div className="flex items-center gap-2">
                 <input
@@ -90,7 +101,7 @@ const AddAnswerForm: React.FC<IProps> = ({
               <Button
                 className="bg-[#F7F5FB] dark:bg-[#475B63]"
                 type="reset"
-                onClick={onCancel}
+                onClick={cancel}
               >
                 لغو
               </Button>
